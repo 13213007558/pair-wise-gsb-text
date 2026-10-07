@@ -17,6 +17,32 @@ A collection of text algorithms.
   Text::Levenshtein.distance('test', 'testing', 2)
   # => 2
 
+==== Levenshtein dictionary index
+
+A trie index can avoid recalculating the states shared by dictionary prefixes.
+It retains each original entry even when several entries normalize to the same
+text. Equal distances are ordered by the supplied priority, then by input
+order.
+
+  dictionary = Text::Levenshtein::Dictionary.new(
+    ['receive', 'received', 'deceive'],
+    normalize: :nfkc_casefold,
+    priority: { 'receive' => 0 }
+  )
+  dictionary.candidates('recieve', max_distance: 2)
+  # => ['receive', 'deceive']
+  dictionary.top_k('recieve', 2)
+  # => ['receive', 'deceive']
+  dictionary.node_count
+  dictionary.candidates_with_stats('recieve', max_distance: 2)[:expanded_nodes]
+
+Indexes use a versioned JSON representation. Loading rejects mismatched
+versions or normalization configuration and never deserializes arbitrary Ruby
+objects.
+
+  json = dictionary.export
+  Text::Levenshtein::Dictionary.load(json)
+
 === Metaphone
 
   Text::Metaphone.metaphone('BRIAN')
