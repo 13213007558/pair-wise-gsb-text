@@ -45,6 +45,34 @@ A collection of text algorithms.
 Note that some intermediate information is cached on the instance to improve
 performance.
 
+=== Word segmentation
+
+Recover word boundaries from joined text using only caller-supplied counts:
+
+  require 'text'
+
+  words = {
+    'at' => 1,
+    'lash' => 1,
+    'tray' => 1
+  }
+  bigrams = { ['at', 'lash'] => 1 }
+  segmenter = Text::WordSegmenter.new(words, bigrams)
+  result = segmenter.segment('atlashtray')
+
+  result.words   # => ['at', 'lash', 'tray']
+  result.score   # Lower scores are better
+  result.ranges  # => [0...2, 2...6, 6...10]
+
+Unknown fragments receive a fixed cost plus a per-character cost and are
+limited by <tt>max_unknown_length</tt>; one unknown fragment can never cover a
+multi-character input. Set <tt>hard_boundaries</tt> to a callable, Regexp, or
+String naming characters that must start and end their own token. Set
+<tt>normalization</tt> to <tt>:none</tt>, <tt>:case</tt>, <tt>:unicode</tt>,
+or <tt>:case_and_unicode</tt>; returned ranges are half-open character offsets
+in the original string. Equal-cost segmentations choose the lexicographically
+smallest canonical word sequence, then the smallest original-value sequence.
+
 == Ruby version compatibility
 
 The library has been tested on Ruby 1.8.6 to 1.9.3 and on JRuby.
