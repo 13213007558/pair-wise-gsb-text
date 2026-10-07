@@ -9,5 +9,6 @@ class TextTest < Test::Unit::TestCase
     assert defined? Text::Soundex
     assert defined? Text::VERSION
     assert defined? Text::WhiteSimilarity
+    assert defined? Text::WordSegmenter
   end
 end

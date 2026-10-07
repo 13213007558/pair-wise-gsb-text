@@ -45,6 +45,35 @@ A collection of text algorithms.
 Note that some intermediate information is cached on the instance to improve
 performance.
 
+=== Word segmentation
+
+Segment a string that was imported without spaces from caller-supplied word
+counts. Optional bigram counts can favor likely adjacent words.
+
+  segmenter = Text::WordSegmenter.new(
+    { "cat" => 50, "sand" => 50, "dogs" => 50, "cats" => 2, "and" => 2 }
+  )
+  result = segmenter.segment("catsanddogs")
+  result.words # => ["cat", "sand", "dogs"]
+  result.score # highest score wins
+
+Each token keeps the original character and byte offsets. Normalization is
+used only for dictionary lookup; returned text and ranges still refer to the
+input:
+
+  Text::WordSegmenter.new(counts, case_normalization: :downcase)
+  Text::WordSegmenter.new(counts, unicode_normalization: :nfc)
+
+The caller declares hard boundaries for digits and punctuation. A Regexp or
+callable marks individual characters; an Enumerable of cut positions is also
+accepted:
+
+  segmenter.segment("cat1dog", hard_boundaries: /\A[\d\p{P}]\z/)
+
+Unknown pieces receive a base penalty plus a per-character penalty. They are
+capped by <tt>max_unknown_length</tt>, so a long string cannot falsely win by
+becoming one unknown word. Known words are not subject to that cap.
+
 == Ruby version compatibility
 
 The library has been tested on Ruby 1.8.6 to 1.9.3 and on JRuby.
