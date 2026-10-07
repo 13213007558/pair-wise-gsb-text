@@ -17,6 +17,29 @@ A collection of text algorithms.
   Text::Levenshtein.distance('test', 'testing', 2)
   # => 2
 
+=== Damerau-Levenshtein distance
+
+The full (unrestricted) Damerau-Levenshtein distance, which also allows
+transposing adjacent characters and may edit a substring more than once:
+
+  Text::DamerauLevenshtein.distance('test', 'tset')
+  # => 1
+  Text::DamerauLevenshtein.distance('CA', 'ABC')
+  # => 2
+
+With a maximum distance, the exact distance is returned unless it exceeds
+the maximum, in which case a Range covering the true distance is returned:
+
+  Text::DamerauLevenshtein.distance('kitten', 'sitting', 2)
+  # => 3..7
+
+An optimal edit script can be produced and replayed:
+
+  operations = Text::DamerauLevenshtein.edit_sequence('CA', 'ABC')
+  # => [[:transpose, 0, 'C', 'A'], [:insert, 1, 'B']]
+  Text::DamerauLevenshtein.apply('CA', operations)
+  # => 'ABC'
+
 === Metaphone
 
   Text::Metaphone.metaphone('BRIAN')
