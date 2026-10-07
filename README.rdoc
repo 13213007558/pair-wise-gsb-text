@@ -17,6 +17,40 @@ A collection of text algorithms.
   Text::Levenshtein.distance('test', 'testing', 2)
   # => 2
 
+=== Levenshtein dictionary
+
+For repeated lookups, build a trie-backed dictionary. Searches reuse edit rows
+for common prefixes and only descend branches whose lower bound can be within the
+threshold or current top-k cutoff.
+
+  dictionary = Text::Levenshtein::Dictionary.new(['cat', 'car', 'card'])
+  dictionary.candidates('car', 1)
+  # => ['car', 'card', 'cat']
+  dictionary.top_k('car', 2)
+  # => ['car', 'card']
+
+Pass a block or per-entry priorities to define the stable order for equal edit
+distance. Entries without a priority retain insertion order. Normalization can be
+selected with +normalization+ (+:nfc+, +:nfd+, +:nfkc+, or +:nfkd+) and
++case_insensitive: true+; the original entries are returned and duplicates that
+normalize to the same text are retained.
+
+  dictionary = Text::Levenshtein::Dictionary.new(['cat', 'car']) do |entry|
+    entry == 'car' ? 0 : 1
+  end
+
+Search stats expose how many trie nodes were visited:
+
+  result = dictionary.candidates('car', 1, include_stats: true)
+  result.expanded_nodes
+
+Export to JSON and reload it later. Loading checks the format version and
+normalization configuration. JSON is parsed without object construction, so
+exports cannot instantiate arbitrary Ruby objects.
+
+  exported = dictionary.export
+  Text::Levenshtein::Dictionary.load(exported)
+
 === Metaphone
 
   Text::Metaphone.metaphone('BRIAN')

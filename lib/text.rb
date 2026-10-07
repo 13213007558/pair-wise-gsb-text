@@ -1,5 +1,6 @@
 require 'text/double_metaphone'
 require 'text/levenshtein'
+require 'text/levenshtein/dictionary'
 require 'text/metaphone'
 require 'text/porter_stemming'
 require 'text/soundex'
