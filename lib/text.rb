@@ -1,3 +1,4 @@
+require 'text/damerau_levenshtein'
 require 'text/double_metaphone'
 require 'text/levenshtein'
 require 'text/metaphone'

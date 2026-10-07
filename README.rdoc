@@ -17,6 +17,23 @@ A collection of text algorithms.
   Text::Levenshtein.distance('test', 'testing', 2)
   # => 2
 
+=== Damerau-Levenshtein distance
+
+Like Levenshtein, but a transposition of two adjacent characters also counts
+as a single edit. This is the full algorithm: substrings may be edited more
+than once.
+
+  Text::DamerauLevenshtein.distance('CA', 'ABC')
+  # => 2 (transpose, then insert)
+
+  Text::DamerauLevenshtein.distance('kitten', 'sitting', 2)
+  # => #<Text::DamerauLevenshtein::LimitExceeded range=3..6>
+
+  seq = Text::DamerauLevenshtein.edit_sequence('CA', 'ABC')
+  seq.distance    # => 2
+  seq.operations  # => [#<struct type=:transpose, ...>, #<struct type=:insert, ...>]
+  seq.apply       # => 'ABC'
+
 === Metaphone
 
   Text::Metaphone.metaphone('BRIAN')
